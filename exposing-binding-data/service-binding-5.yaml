@@ -1,0 +1,16 @@
+---
+apiVersion: binding.operators.coreos.com/v1alpha1
+kind: ServiceBinding
+metadata:
+  name: service-binding-5
+spec:
+  services:
+  - group: "example.com"
+    version: v1alpha1
+    kind: AccountService
+    name: account-service-2
+  application:
+    name: application-1
+    group: apps
+    version: v1
+    resource: deployments

@@ -1,0 +1,11 @@
+apiVersion: example.com/v1alpha1
+kind: AccountService
+metadata:
+  name: account-service-3
+  annotations:
+    service.binding/username: path={.status.data.configuration},objectType=ConfigMap,sourceKey=username
+spec:
+  foo: bar
+status:
+  data:
+    configuration: config-1

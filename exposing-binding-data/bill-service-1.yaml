@@ -1,0 +1,10 @@
+apiVersion: example.com/v1alpha1
+kind: BillService
+metadata:
+  name: bill-service-1
+spec:
+  foo: bar
+status:
+  data:
+    credentials: secret-1
+    config: config-2

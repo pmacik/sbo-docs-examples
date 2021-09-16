@@ -1,0 +1,6 @@
+apiVersion: example.com/v1alpha1
+kind: AccountService
+metadata:
+  name: account-service-4
+spec:
+  foo: bar

@@ -1,0 +1,15 @@
+---
+apiVersion: service.binding/v1alpha2
+kind: ServiceBinding
+metadata:
+  name: service-binding-2
+spec:
+  type: account-service
+  service:
+    apiVersion: "example.com/v1alpha1"
+    kind: AccountService
+    name: account-service-1
+  application:
+    name: application-1
+    apiVersion: apps/v1
+    kind: Deployment

@@ -1,0 +1,11 @@
+apiVersion: example.com/v1alpha1
+kind: AccountService
+metadata:
+  name: account-service-2
+  annotations:
+    service.binding: path={.status.data.credentials},objectType=Secret
+spec:
+  foo: bar
+status:
+  data:
+    credentials: secret-1

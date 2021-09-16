@@ -1,0 +1,209 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: accountservices.example.com
+spec:
+  group: example.com
+  names:
+    kind: AccountService
+    listKind: AccountServiceList
+    plural: accountservices
+    singular: accountservice
+    shortNames:
+      - as
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              properties:
+                foo:
+                  type: string
+              type: object
+            status:
+              type: object
+              properties:
+                binding:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                data:
+                  type: object
+                  properties:
+                    credentials:
+                      type: string
+                    configuration:
+                      type: string
+          type: object
+      served: true
+      storage: true
+      subresources: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: billservices.example.com
+spec:
+  group: example.com
+  names:
+    kind: BillService
+    listKind: BillServiceList
+    plural: billservices
+    singular: billservice
+    shortNames:
+      - bs
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              properties:
+                foo:
+                  type: string
+              type: object
+            status:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    credentials:
+                      type: string
+                    config:
+                      type: string
+          type: object
+      served: true
+      storage: true
+      subresources: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    capabilities: Basic Install
+  name: account-service-example-operator.v0.0.0
+  namespace: openshift-operators
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: Account Service
+        displayName: Account Service
+        kind: AccountService
+        name: accountservices.example.com
+        version: v1alpha1
+      - description: Bill Service
+        displayName: Bill Service
+        kind: BillService
+        name: billservices.example.com
+        version: v1alpha1
+        statusDescriptors:
+          - description: Secret Credentials
+            displayName: Secret Credentials
+            path: data.credentials
+            x-descriptors:
+              - urn:alm:descriptor:io.kubernetes:Secret
+              - service.binding
+          - description: Config 
+            displayName: Config
+            path: data.config
+            x-descriptors:
+              - urn:alm:descriptor:io.kubernetes:ConfigMap
+              - service.binding
+  displayName: Account Service Example Operator
+  install:
+    spec:
+      deployments:
+        - name: account-service-example-operator
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                name: account-service-example-operator
+            strategy: {}
+            template:
+              metadata:
+                labels:
+                  name: account-service-example-operator
+              spec:
+                containers:
+                  - command:
+                      - sleep
+                      - "3600"
+                    env:
+                      - name: WATCH_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.annotations['olm.targetNamespaces']
+                      - name: POD_NAME
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.name
+                      - name: OPERATOR_NAME
+                        value: account-service-example-operator
+                    image: busybox
+                    imagePullPolicy: Always
+                    name: account-service-example-operator
+                    resources: {}
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: accountservices-reader
+rules:
+  - apiGroups: ["example.com"]
+    resources: ["accountservices","billservices"]
+    verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: service-binding-operator-accountservices-reader
+subjects:
+  - kind: ServiceAccount
+    name: service-binding-operator
+    namespace: openshift-operators
+roleRef:
+  kind: ClusterRole
+  name: accountservices-reader
+  apiGroup: rbac.authorization.k8s.io

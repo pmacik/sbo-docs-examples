@@ -1,0 +1,1 @@
+oc patch configmap config-2 --type merge -p '{"metadata":{"ownerReferences": [{"apiVersion":"example.com/v1alpha1", "kind":"AccountService", "name":"account-service-4","uid":"630dea05-6d51-4596-922a-6361c1bd6a77"}]}}' 
